@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
+	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
 type writer struct {
@@ -20,7 +21,7 @@ func NewWriter(to chan dto.Data) IProcess {
 }
 
 func (w *writer) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
-	// defer recovery.Recover()
+	defer recovery.Recover()
 	w.process.status <- 1
 	for {
 		select {
