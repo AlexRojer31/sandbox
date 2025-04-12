@@ -19,8 +19,9 @@ type Sandbox struct {
 
 func Run(args []string) int {
 	defer recovery.Recover()
-	sandbox := Sandbox{}
-	sandbox.container = container.GetInstance(args)
+	sandbox := Sandbox{
+		container: container.GetInstance(args),
+	}
 
 	errors := make(chan error, 10000)
 	ctx, ctxCancel := context.WithCancel(context.Background())
