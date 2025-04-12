@@ -45,15 +45,12 @@ func newProcess(name string, to chan dto.Data, handle handle) process {
 		name: name,
 		to:   to,
 	}
-	if to == nil {
-		process.to = make(chan dto.Data, 1)
-	}
 	process.status = make(chan int, 1)
 	process.logger = container.GetInstance().Logger
 
 	process.runf = process.run
 	process.namef = func() string {
-		return process.namef()
+		return process.name
 	}
 	process.stopf = func(errCh chan error, args ...any) {
 		process.logger.Warn(process.name, " stopping...")
@@ -68,7 +65,9 @@ func newProcess(name string, to chan dto.Data, handle handle) process {
 	if handle == nil {
 		process.handlef = func(msg dto.Data, errCh chan error) {
 			defer recovery.Recover()
-			process.to <- msg
+			if process.to != nil {
+				process.to <- msg
+			}
 		}
 	} else {
 		process.handlef = handle
@@ -91,13 +90,16 @@ func (p *process) Stop(errCh chan error, args ...any) {
 func (p *process) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	p.status <- 1
+	p.logger.Info(p.name, " stared.")
 	for {
 		select {
 		case <-ctx.Done():
 			for msg := range from {
 				p.handlef(msg, errCh)
 			}
-			close(p.to)
+			if p.to != nil {
+				close(p.to)
+			}
 			close(p.status)
 			return
 		case msg, ok := <-from:

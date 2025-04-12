@@ -29,13 +29,14 @@ func Run(args []string) int {
 	data := make(chan dto.Data, 1)
 	writer := processes.NewWriter(data)
 	reader := processes.NewReader()
+
 	writer.Run(ctx, errors, nil)
 	reader.Run(ctx, errors, data)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	if sig, ok := <-interrupt; ok {
-		sandbox.container.Logger.Info("Catch signal " + sig.String())
+		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
 		writer.Stop(errors)
 		reader.Stop(errors)
