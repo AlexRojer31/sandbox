@@ -90,7 +90,7 @@ func (p *process) Stop(errCh chan error, args ...any) {
 func (p *process) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	p.status <- 1
-	p.logger.Info(p.name, " stared.")
+	p.logger.Info(p.name, " started.")
 	for {
 		select {
 		case <-ctx.Done():

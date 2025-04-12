@@ -23,7 +23,7 @@ func NewWriter(to chan dto.Data) IProcess {
 func (w *writer) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	w.process.status <- 1
-	w.logger.Info(w.name, " stared.")
+	w.logger.Info(w.name, " started.")
 	for {
 		select {
 		case <-ctx.Done():
