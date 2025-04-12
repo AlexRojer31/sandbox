@@ -1,0 +1,46 @@
+services:
+  sandbox:
+    container_name: sandbox
+    build:
+      context: . 
+      dockerfile: ./docker/sandbox/Dockerfile
+    ports:
+      - "8082:8082"
+    command:
+      - -c
+      - configs/dev.yaml
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./internal
+          target: /sandbox/internal
+        - action: sync+restart
+          path: ./go.mod
+          target: /sandbox/go.mod
+        - action: sync+restart
+          path: ./configs
+          target: /sandbox/configs
+    depends_on:
+      nginx:
+        condition: service_started
+    networks:
+      - sandbox-net
+    links:
+      - nginx
+
+  nginx:
+    image: nginx:1.26.2-alpine-slim
+    container_name: nginx
+    ports:
+      - "8083:80"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./docker/nginx
+          target: /etc/nginx/conf.d
+    networks:
+      - sandbox-net
+
+networks:
+  sandbox-net:
+    name: sandbox-net
