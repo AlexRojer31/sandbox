@@ -11,8 +11,6 @@ import (
 type Container struct {
 	Env    *environment.Env
 	Logger *logrus.Logger
-
-	wg sync.WaitGroup
 }
 
 var (
@@ -32,7 +30,6 @@ func GetInstance(args ...any) *Container {
 				}
 				container.Env = env
 				container.setLogger()
-				container.wg.Add(1)
 
 				instance = &container
 				return
