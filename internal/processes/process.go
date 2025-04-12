@@ -67,6 +67,7 @@ func newProcess(name string, to chan dto.Data, handle handle) process {
 
 	if handle == nil {
 		process.handlef = func(msg dto.Data, errCh chan error) {
+			recovery.Recover()
 			process.to <- msg
 		}
 	} else {

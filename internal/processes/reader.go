@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
+	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
 type reader struct {
@@ -18,5 +19,6 @@ func NewReader() IProcess {
 }
 
 func (p *reader) handle(msg dto.Data, errCh chan error) {
+	recovery.Recover()
 	fmt.Println(dto.ParceData[int](msg))
 }
