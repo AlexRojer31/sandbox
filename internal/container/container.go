@@ -1,4 +1,4 @@
-package app
+package container
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type App struct {
+type Container struct {
 	Env    *environment.Env
 	Logger *logrus.Logger
 
@@ -16,25 +16,25 @@ type App struct {
 }
 
 var (
-	instance *App
+	instance *Container
 	once     sync.Once
 )
 
-func GetInstance(args ...any) *App {
+func GetInstance(args ...any) *Container {
 	once.Do(func() {
 		for _, a := range args {
 			switch v := a.(type) {
 			case []string:
-				app := App{}
+				container := Container{}
 				env, err := environment.New(v)
 				if err != nil {
 					panic(err)
 				}
-				app.Env = env
-				app.setLogger()
-				app.wg.Add(1)
+				container.Env = env
+				container.setLogger()
+				container.wg.Add(1)
 
-				instance = &app
+				instance = &container
 				return
 			}
 		}
@@ -43,7 +43,7 @@ func GetInstance(args ...any) *App {
 	return instance
 }
 
-func (app *App) setLogger() {
+func (app *Container) setLogger() {
 	app.Logger = logrus.New()
 	app.Logger.SetFormatter(
 		&logrus.TextFormatter{

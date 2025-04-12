@@ -3,7 +3,7 @@ package processes
 import (
 	"context"
 
-	"github.com/AlexRojer31/sandbox/internal/app"
+	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/sirupsen/logrus"
@@ -49,7 +49,7 @@ func newProcess(name string, to chan dto.Data, handle handle) process {
 		process.to = make(chan dto.Data, 1)
 	}
 	process.status = make(chan int, 1)
-	process.logger = app.GetInstance().Logger
+	process.logger = container.GetInstance().Logger
 
 	process.runf = process.run
 	process.namef = func() string {
