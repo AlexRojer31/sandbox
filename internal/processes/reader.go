@@ -19,6 +19,6 @@ func NewReader() IProcess {
 }
 
 func (p *reader) handle(msg dto.Data, errCh chan error) {
-	recovery.Recover()
-	fmt.Println(dto.ParceData[string](msg))
+	defer recovery.Recover()
+	fmt.Println(dto.ParceData[int](msg))
 }

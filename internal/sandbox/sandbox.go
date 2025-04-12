@@ -9,6 +9,7 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/processes"
+	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/golangci/golangci-lint/pkg/exitcodes"
 )
 
@@ -17,7 +18,7 @@ type Sandbox struct {
 }
 
 func Run(args []string) int {
-	// defer recovery.Recover()
+	defer recovery.Recover()
 	sandbox := Sandbox{
 		container: container.GetInstance(args),
 	}
