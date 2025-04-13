@@ -22,11 +22,12 @@ func NewCustomReader(to chan dto.Data, args ...any) IProcess {
 func (r *customReader) fetchMsg() (dto.Data, error) {
 	defer recovery.Recover()
 	time.Sleep(time.Second)
+	r.logger.Info("Fetching")
 	return dto.Data{
 		Value: rand.Intn(100),
 	}, nil
 }
 
 func (r *customReader) commitMsg(msg dto.Data, errCh chan dto.Data) {
-	r.logger.Info("I COMMIT!")
+	r.logger.Info("Commiting")
 }

@@ -2,8 +2,6 @@ package processes
 
 import (
 	"context"
-	"errors"
-	"io"
 	"time"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
@@ -77,21 +75,13 @@ func (r *reader) fetch(ctx context.Context, errCh chan dto.Data, args ...any) {
 		default:
 			msg, err := r.fetchMsgf()
 			if err != nil {
-				if errors.Is(err, io.EOF) {
-					errCh <- dto.Data{
-						Value: err,
-					}
-				} else if errors.Is(err, context.Canceled) {
-					break
-				} else {
-					errCh <- dto.Data{
-						Value: err,
-					}
+				errCh <- dto.Data{
+					Value: err,
 				}
 			} else {
 				r.to <- msg
+				r.commitCh <- msg
 			}
-			r.commitCh <- msg
 		}
 	}
 }
