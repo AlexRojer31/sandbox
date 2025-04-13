@@ -20,7 +20,7 @@ func NewEriter(to chan dto.Data) IProcess {
 	return &emitter
 }
 
-func (e *emitter) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
+func (e *emitter) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	e.process.status <- 1
 	e.logger.Info(e.name, " started.")

@@ -23,7 +23,7 @@ func Run(args []string) int {
 		container: container.GetInstance(args),
 	}
 
-	errors := make(chan error, 10000)
+	errCh := make(chan dto.Data, 10000)
 	ctx, ctxCancel := context.WithCancel(context.Background())
 
 	emitter2filter := make(chan dto.Data, 1000)
@@ -34,18 +34,18 @@ func Run(args []string) int {
 	})
 	reader := processes.NewReader()
 
-	emitter.Run(ctx, errors, nil)
-	filter.Run(ctx, errors, emitter2filter)
-	reader.Run(ctx, errors, filter2reader)
+	emitter.Run(ctx, errCh, nil)
+	filter.Run(ctx, errCh, emitter2filter)
+	reader.Run(ctx, errCh, filter2reader)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	if sig, ok := <-interrupt; ok {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
-		emitter.Stop(errors)
-		filter.Stop(errors)
-		reader.Stop(errors)
+		emitter.Stop(errCh)
+		filter.Stop(errCh)
+		reader.Stop(errCh)
 
 		return exitcodes.Success
 	}

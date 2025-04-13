@@ -16,8 +16,8 @@ type INamed interface {
 }
 
 type IRun interface {
-	Run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
-	Stop(errCh chan error, args ...any)
+	Run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any)
+	Stop(errCh chan dto.Data, args ...any)
 }
 
 type IProcess interface {
@@ -26,9 +26,9 @@ type IProcess interface {
 }
 
 type Namef func() string
-type Runf func(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
-type Stopf func(errCh chan error, args ...any)
-type Handlef func(msg dto.Data, errCh chan error)
+type Runf func(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any)
+type Stopf func(errCh chan dto.Data, args ...any)
+type Handlef func(msg dto.Data, errCh chan dto.Data)
 
 type process struct {
 	name string
@@ -53,13 +53,13 @@ func newProcess(name string, to chan dto.Data, args ...any) process {
 
 	for _, obj := range args {
 		switch v := obj.(type) {
-		case func(msg dto.Data, errCh chan error):
+		case func(msg dto.Data, errCh chan dto.Data):
 			process.handlef = v
 		}
 	}
 
 	if process.handlef == nil {
-		process.handlef = func(msg dto.Data, errCh chan error) {
+		process.handlef = func(msg dto.Data, errCh chan dto.Data) {
 			defer recovery.Recover()
 			if process.to != nil {
 				process.to <- msg
@@ -71,7 +71,7 @@ func newProcess(name string, to chan dto.Data, args ...any) process {
 	process.namef = func() string {
 		return process.name
 	}
-	process.stopf = func(errCh chan error, args ...any) {
+	process.stopf = func(errCh chan dto.Data, args ...any) {
 		process.logger.Warn(process.name, " stopping...")
 		for v := range process.status {
 			if v > 0 {
@@ -87,15 +87,15 @@ func (p *process) GetName() string {
 	return p.namef()
 }
 
-func (p *process) Run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
+func (p *process) Run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
 	go p.runf(ctx, errCh, from, args...)
 }
 
-func (p *process) Stop(errCh chan error, args ...any) {
+func (p *process) Stop(errCh chan dto.Data, args ...any) {
 	p.stopf(errCh, args...)
 }
 
-func (p *process) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
+func (p *process) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	p.status <- 1
 	p.logger.Info(p.name, " started.")
