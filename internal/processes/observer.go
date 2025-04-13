@@ -21,8 +21,8 @@ func NewObserver[T any](name string) (IProcess, chan dto.Data) {
 	}
 	observer.process = newProcess(name+"Observer", nil)
 
-	observer.process.runf = observer.run
-	observer.process.stopf = observer.stop
+	observer.runf = observer.run
+	observer.stopf = observer.stop
 	return &observer, observeCh
 }
 
@@ -52,12 +52,12 @@ func (o *observer[T]) handle(msg dto.Data) {
 }
 
 func (o *observer[T]) stop(errCh chan dto.Data, args ...any) {
-	o.process.logger.Warn(o.process.name, " stopping...")
+	o.logger.Warn(o.name, " stopping...")
 	close(o.observeCh)
-	for v := range o.process.status {
+	for v := range o.status {
 		if v > 0 {
 			continue
 		}
 	}
-	o.process.logger.Warn(o.process.name, " stopped")
+	o.logger.Warn(o.name, " stopped")
 }

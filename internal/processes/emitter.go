@@ -16,23 +16,23 @@ type emitter struct {
 func NewEriter(to chan dto.Data) IProcess {
 	emitter := emitter{process: newProcess("Emitter", to)}
 
-	emitter.process.runf = emitter.run
+	emitter.runf = emitter.run
 	return &emitter
 }
 
 func (e *emitter) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
-	e.process.status <- 1
+	e.status <- 1
 	e.logger.Info(e.name, " started.")
 	for {
 		select {
 		case <-ctx.Done():
-			close(e.process.to)
-			close(e.process.status)
+			close(e.to)
+			close(e.status)
 			return
 		default:
 			time.Sleep(time.Second)
-			e.process.to <- dto.Data{
+			e.to <- dto.Data{
 				Value: rand.Intn(100),
 			}
 		}
