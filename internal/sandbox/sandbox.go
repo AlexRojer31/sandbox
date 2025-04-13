@@ -29,7 +29,7 @@ func Run(args []string) int {
 
 	reader2filter := make(chan dto.Data, 1000)
 	filter2sender := make(chan dto.Data, 1000)
-	reader := processes.NewReader(reader2filter)
+	reader := processes.NewCustomReader(reader2filter)
 	filter := processes.NewFilter(filter2sender, func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
 	})

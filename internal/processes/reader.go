@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"math/rand"
 	"time"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
@@ -25,7 +24,7 @@ type reader struct {
 	commitMsgf Commitf
 }
 
-func NewReader(name string, to chan dto.Data, args ...any) IProcess {
+func newReader(name string, to chan dto.Data, args ...any) reader {
 	reader := reader{
 		commitCh: make(chan dto.Data, 1000),
 	}
@@ -45,7 +44,7 @@ func NewReader(name string, to chan dto.Data, args ...any) IProcess {
 			defer recovery.Recover()
 			time.Sleep(time.Second)
 			return dto.Data{
-				Value: rand.Intn(100),
+				Value: 51,
 			}, nil
 		}
 	}
@@ -57,7 +56,7 @@ func NewReader(name string, to chan dto.Data, args ...any) IProcess {
 	reader.fetchf = reader.fetch
 	reader.commitf = reader.commit
 	reader.runf = reader.run
-	return &reader
+	return reader
 }
 
 func (r *reader) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
