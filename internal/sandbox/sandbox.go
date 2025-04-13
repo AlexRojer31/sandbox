@@ -46,9 +46,9 @@ func Run(args []string) int {
 	if sig, ok := <-interrupt; ok {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
-		reader.Stop(errCh)
-		filter.Stop(errCh)
 		sender.Stop(errCh)
+		filter.Stop(errCh)
+		reader.Stop(errCh)
 
 		errorObserver.Stop()
 		return exitcodes.Success

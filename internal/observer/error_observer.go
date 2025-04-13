@@ -1,8 +1,6 @@
 package observer
 
 import (
-	"fmt"
-
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
@@ -20,5 +18,5 @@ func NewErrorObserver() IObserve {
 
 func (o *errorObserver) handle(msg dto.Data) {
 	recovery.Recover()
-	fmt.Println(dto.ParceData[error](msg))
+	o.logger.Error(dto.ParceData[error](msg))
 }
