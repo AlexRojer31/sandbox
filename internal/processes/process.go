@@ -25,6 +25,9 @@ type IProcess interface {
 	IRun
 }
 
+type Namef func() string
+type Runf func(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
+type Stopf func(errCh chan error, args ...any)
 type Handlef func(msg dto.Data, errCh chan error)
 
 type process struct {
@@ -34,9 +37,9 @@ type process struct {
 	status chan int
 	logger *logrus.Logger
 
-	namef   func() string
-	runf    func(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
-	stopf   func(errCh chan error, args ...any)
+	namef   Namef
+	runf    Runf
+	stopf   Stopf
 	handlef Handlef
 }
 
