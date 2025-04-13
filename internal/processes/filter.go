@@ -15,7 +15,7 @@ type filter struct {
 
 func NewFilter(to chan dto.Data, filterf Filterf) IProcess {
 	filter := filter{}
-	filter.process = newProcess("Reader", to, filter.handle)
+	filter.process = newProcess("Filter", to, filter.handle)
 
 	if filterf == nil {
 		filter.filterf = filter.filter

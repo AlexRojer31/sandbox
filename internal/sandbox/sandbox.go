@@ -27,19 +27,19 @@ func Run(args []string) int {
 	ctx, ctxCancel := context.WithCancel(context.Background())
 
 	emitter2filter := make(chan dto.Data, 1000)
-	filter2reader := make(chan dto.Data, 1000)
+	filter2sender := make(chan dto.Data, 1000)
 	emitter := processes.NewEriter(emitter2filter)
-	filter := processes.NewFilter(filter2reader, func(msg dto.Data) bool {
+	filter := processes.NewFilter(filter2sender, func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
 	})
-	reader := processes.NewReader()
+	sender := processes.NewSender("blaBlaBla")
 
 	emitter.Run(ctx, errCh, nil)
 	filter.Run(ctx, errCh, emitter2filter)
-	reader.Run(ctx, errCh, filter2reader)
+	sender.Run(ctx, errCh, filter2sender)
 
-	errorObserver := processes.NewObserver("errors")
-	errorObserver.Run(ctx, nil, errCh)
+	errorObserver := processes.NewErrorsObserver(errCh)
+	errorObserver.Run(ctx, nil, nil)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -48,9 +48,9 @@ func Run(args []string) int {
 		ctxCancel()
 		emitter.Stop(errCh)
 		filter.Stop(errCh)
-		reader.Stop(errCh)
+		sender.Stop(errCh)
 
-		reader.Stop(nil)
+		errorObserver.Stop(nil)
 		return exitcodes.Success
 	}
 	ctxCancel()
