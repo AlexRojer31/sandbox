@@ -3,6 +3,7 @@ package processes
 import (
 	"context"
 
+	"github.com/AlexRojer31/sandbox/internal/common"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
@@ -11,17 +12,13 @@ import (
 
 type Status int
 
-type INamed interface {
-	GetName() string
-}
-
 type IRun interface {
 	Run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any)
 	Stop(errCh chan dto.Data, args ...any)
 }
 
 type IProcess interface {
-	INamed
+	common.INamed
 	IRun
 }
 
