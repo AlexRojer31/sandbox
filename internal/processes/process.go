@@ -25,7 +25,7 @@ type IProcess interface {
 	IRun
 }
 
-type handle func(msg dto.Data, errCh chan error)
+type handlef func(msg dto.Data, errCh chan error)
 
 type process struct {
 	name string
@@ -37,16 +37,32 @@ type process struct {
 	namef   func() string
 	runf    func(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
 	stopf   func(errCh chan error, args ...any)
-	handlef handle
+	handlef handlef
 }
 
-func newProcess(name string, to chan dto.Data, handle handle) process {
+func newProcess(name string, to chan dto.Data, args ...any) process {
 	process := process{
 		name: name,
 		to:   to,
 	}
 	process.status = make(chan int, 1)
 	process.logger = container.GetInstance().Logger
+
+	for _, obj := range args {
+		switch v := obj.(type) {
+		case func(msg dto.Data, errCh chan error):
+			process.handlef = v
+		}
+	}
+
+	if process.handlef == nil {
+		process.handlef = func(msg dto.Data, errCh chan error) {
+			defer recovery.Recover()
+			if process.to != nil {
+				process.to <- msg
+			}
+		}
+	}
 
 	process.runf = process.run
 	process.namef = func() string {
@@ -60,17 +76,6 @@ func newProcess(name string, to chan dto.Data, handle handle) process {
 			}
 		}
 		process.logger.Warn(process.name, " stopped")
-	}
-
-	if handle == nil {
-		process.handlef = func(msg dto.Data, errCh chan error) {
-			defer recovery.Recover()
-			if process.to != nil {
-				process.to <- msg
-			}
-		}
-	} else {
-		process.handlef = handle
 	}
 	return process
 }

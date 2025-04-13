@@ -9,30 +9,30 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
-type writer struct {
+type emitter struct {
 	process
 }
 
 func NewWriter(to chan dto.Data) IProcess {
-	writer := writer{process: newProcess("Writer", to, nil)}
+	emitter := emitter{process: newProcess("Emitter", to)}
 
-	writer.process.runf = writer.run
-	return &writer
+	emitter.process.runf = emitter.run
+	return &emitter
 }
 
-func (w *writer) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
+func (e *emitter) run(ctx context.Context, errCh chan error, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
-	w.process.status <- 1
-	w.logger.Info(w.name, " started.")
+	e.process.status <- 1
+	e.logger.Info(e.name, " started.")
 	for {
 		select {
 		case <-ctx.Done():
-			close(w.process.to)
-			close(w.process.status)
+			close(e.process.to)
+			close(e.process.status)
 			return
 		default:
 			time.Sleep(time.Second)
-			w.process.to <- dto.Data{
+			e.process.to <- dto.Data{
 				Value: rand.Intn(100),
 			}
 		}
