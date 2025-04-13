@@ -24,7 +24,7 @@ func Run(args []string) int {
 	}
 
 	ctx, ctxCancel := context.WithCancel(context.Background())
-	errorObserver, errCh := processes.NewObserver("errors")
+	errorObserver, errCh := processes.NewObserver[error]("errors")
 	errorObserver.Run(ctx, nil, nil)
 
 	emitter2filter := make(chan dto.Data, 1000)

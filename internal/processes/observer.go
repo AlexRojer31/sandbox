@@ -8,15 +8,15 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
-type observer struct {
+type observer[T any] struct {
 	process
 
 	observeCh chan dto.Data
 }
 
-func NewObserver(name string) (IProcess, chan dto.Data) {
+func NewObserver[T any](name string) (IProcess, chan dto.Data) {
 	observeCh := make(chan dto.Data, 1000)
-	observer := observer{
+	observer := observer[T]{
 		observeCh: observeCh,
 	}
 	observer.process = newProcess(name+"Observer", nil)
@@ -26,7 +26,7 @@ func NewObserver(name string) (IProcess, chan dto.Data) {
 	return &observer, observeCh
 }
 
-func (o *observer) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
+func (o *observer[T]) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
 	defer recovery.Recover()
 	o.status <- 1
 	o.logger.Info(o.name, " started.")
@@ -46,12 +46,12 @@ func (o *observer) run(ctx context.Context, errCh chan dto.Data, from chan dto.D
 	}
 }
 
-func (o *observer) handle(msg dto.Data) {
+func (o *observer[T]) handle(msg dto.Data) {
 	defer recovery.Recover()
-	fmt.Println(dto.ParceData[error](msg))
+	fmt.Println(dto.ParceData[T](msg))
 }
 
-func (o *observer) stop(errCh chan dto.Data, args ...any) {
+func (o *observer[T]) stop(errCh chan dto.Data, args ...any) {
 	o.process.logger.Warn(o.process.name, " stopping...")
 	close(o.observeCh)
 	for v := range o.process.status {
