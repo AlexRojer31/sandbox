@@ -38,6 +38,9 @@ func Run(args []string) int {
 	filter.Run(ctx, errCh, emitter2filter)
 	reader.Run(ctx, errCh, filter2reader)
 
+	errorObserver := processes.NewObserver("errors")
+	errorObserver.Run(ctx, nil, errCh)
+
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	if sig, ok := <-interrupt; ok {
@@ -47,6 +50,7 @@ func Run(args []string) int {
 		filter.Stop(errCh)
 		reader.Stop(errCh)
 
+		reader.Stop(nil)
 		return exitcodes.Success
 	}
 	ctxCancel()
