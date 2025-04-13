@@ -27,16 +27,16 @@ func Run(args []string) int {
 	errorObserver, errCh := processes.NewObserver[error]("errors")
 	errorObserver.Run(ctx, nil, nil)
 
-	emitter2filter := make(chan dto.Data, 1000)
+	reader2filter := make(chan dto.Data, 1000)
 	filter2sender := make(chan dto.Data, 1000)
-	emitter := processes.NewEriter(emitter2filter)
+	reader := processes.NewReader(reader2filter)
 	filter := processes.NewFilter(filter2sender, func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
 	})
 	sender := processes.NewSender("blaBlaBla")
 
-	emitter.Run(ctx, errCh, nil)
-	filter.Run(ctx, errCh, emitter2filter)
+	reader.Run(ctx, errCh, nil)
+	filter.Run(ctx, errCh, reader2filter)
 	sender.Run(ctx, errCh, filter2sender)
 
 	interrupt := make(chan os.Signal, 1)
@@ -44,7 +44,7 @@ func Run(args []string) int {
 	if sig, ok := <-interrupt; ok {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
-		emitter.Stop(errCh)
+		reader.Stop(errCh)
 		filter.Stop(errCh)
 		sender.Stop(errCh)
 
