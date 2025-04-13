@@ -25,11 +25,11 @@ type reader struct {
 	commitMsgf Commitf
 }
 
-func NewReader(to chan dto.Data, args ...any) IProcess {
+func NewReader(name string, to chan dto.Data, args ...any) IProcess {
 	reader := reader{
 		commitCh: make(chan dto.Data, 1000),
 	}
-	reader.process = newProcess("Reader", to)
+	reader.process = newProcess(name+"Reader", to)
 
 	for _, obj := range args {
 		switch v := obj.(type) {
