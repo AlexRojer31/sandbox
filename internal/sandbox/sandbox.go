@@ -23,8 +23,9 @@ func Run(args []string) int {
 		container: container.GetInstance(args),
 	}
 
-	errCh := make(chan dto.Data, 10000)
 	ctx, ctxCancel := context.WithCancel(context.Background())
+	errorObserver, errCh := processes.NewObserver("errors")
+	errorObserver.Run(ctx, nil, nil)
 
 	emitter2filter := make(chan dto.Data, 1000)
 	filter2sender := make(chan dto.Data, 1000)
@@ -37,9 +38,6 @@ func Run(args []string) int {
 	emitter.Run(ctx, errCh, nil)
 	filter.Run(ctx, errCh, emitter2filter)
 	sender.Run(ctx, errCh, filter2sender)
-
-	errorObserver := processes.NewErrorsObserver(errCh)
-	errorObserver.Run(ctx, nil, nil)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
