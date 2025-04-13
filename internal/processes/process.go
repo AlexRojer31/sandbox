@@ -10,8 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Status int
-
 type IRun interface {
 	Run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any)
 	Stop(errCh chan dto.Data, args ...any)
