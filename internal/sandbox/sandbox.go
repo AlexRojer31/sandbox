@@ -8,6 +8,7 @@ import (
 
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
+	"github.com/AlexRojer31/sandbox/internal/observer"
 	"github.com/AlexRojer31/sandbox/internal/processes"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/golangci/golangci-lint/pkg/exitcodes"
@@ -24,8 +25,9 @@ func Run(args []string) int {
 	}
 
 	ctx, ctxCancel := context.WithCancel(context.Background())
-	errorObserver, errCh := processes.NewObserver[error]("errors")
-	errorObserver.Run(ctx, nil, nil)
+	errorObserver := observer.NewErrorObserver()
+	errCh := errorObserver.GetChannel()
+	errorObserver.Observe(ctx)
 
 	reader2filter := make(chan dto.Data, 1000)
 	filter2sender := make(chan dto.Data, 1000)
@@ -33,7 +35,7 @@ func Run(args []string) int {
 	filter := processes.NewFilter(filter2sender, func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
 	})
-	sender := processes.NewSender("blaBlaBla")
+	sender := processes.NewSender("My")
 
 	reader.Run(ctx, errCh, nil)
 	filter.Run(ctx, errCh, reader2filter)
@@ -48,7 +50,7 @@ func Run(args []string) int {
 		filter.Stop(errCh)
 		sender.Stop(errCh)
 
-		errorObserver.Stop(nil)
+		errorObserver.Stop()
 		return exitcodes.Success
 	}
 	ctxCancel()

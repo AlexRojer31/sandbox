@@ -3,6 +3,7 @@ package observer
 import (
 	"context"
 
+	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/sirupsen/logrus"
@@ -38,8 +39,10 @@ type observer[T any] struct {
 func newObserver[T any](name string, args ...any) *observer[T] {
 	observeCh := make(chan dto.Data, 1000)
 	observer := observer[T]{
-		name:      name,
+		name:      name + "Observer",
 		observeCh: observeCh,
+		status:    make(chan int, 1),
+		logger:    container.GetInstance().Logger,
 	}
 
 	for _, obj := range args {
