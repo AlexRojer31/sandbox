@@ -13,7 +13,7 @@ type Fetchf func() (dto.Data, error)
 type Commitf func(msg dto.Data, errCh chan dto.Data)
 
 type reader struct {
-	process
+	*process
 
 	commitCh   chan dto.Data
 	fetchf     Readerf

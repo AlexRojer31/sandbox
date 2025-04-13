@@ -10,7 +10,7 @@ import (
 )
 
 type emitter struct {
-	process
+	*process
 }
 
 func NewEriter(to chan dto.Data) IProcess {

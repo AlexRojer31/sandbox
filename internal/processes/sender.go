@@ -8,7 +8,7 @@ import (
 )
 
 type sender struct {
-	process
+	*process
 }
 
 func NewSender(name string) IProcess {

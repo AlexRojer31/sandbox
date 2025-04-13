@@ -8,7 +8,7 @@ import (
 type Filterf func(msg dto.Data) bool
 
 type filter struct {
-	process
+	*process
 
 	filterf Filterf
 }

@@ -43,7 +43,7 @@ type process struct {
 	handlef Handlef
 }
 
-func newProcess(name string, to chan dto.Data, args ...any) process {
+func newProcess(name string, to chan dto.Data, args ...any) *process {
 	process := process{
 		name: name,
 		to:   to,
@@ -80,7 +80,7 @@ func newProcess(name string, to chan dto.Data, args ...any) process {
 		}
 		process.logger.Warn(process.name, " stopped")
 	}
-	return process
+	return &process
 }
 
 func (p *process) GetName() string {
