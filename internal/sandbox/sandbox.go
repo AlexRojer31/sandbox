@@ -26,19 +26,24 @@ func Run(args []string) int {
 	errors := make(chan error, 10000)
 	ctx, ctxCancel := context.WithCancel(context.Background())
 
-	data := make(chan dto.Data, 1)
-	writer := processes.NewWriter(data)
+	emitter2filter := make(chan dto.Data, 1000)
+	filter2reader := make(chan dto.Data, 1000)
+	emitter := processes.NewEriter(emitter2filter)
+	filter := processes.NewFilter(filter2reader, func(msg dto.Data) bool {
+		return dto.ParceData[int](msg) > 50
+	})
 	reader := processes.NewReader()
 
-	writer.Run(ctx, errors, nil)
-	reader.Run(ctx, errors, data)
+	emitter.Run(ctx, errors, nil)
+	filter.Run(ctx, errors, emitter2filter)
+	reader.Run(ctx, errors, filter2reader)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	if sig, ok := <-interrupt; ok {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
-		writer.Stop(errors)
+		emitter.Stop(errors)
 		reader.Stop(errors)
 
 		return exitcodes.Success

@@ -25,7 +25,7 @@ type IProcess interface {
 	IRun
 }
 
-type handlef func(msg dto.Data, errCh chan error)
+type Handlef func(msg dto.Data, errCh chan error)
 
 type process struct {
 	name string
@@ -37,7 +37,7 @@ type process struct {
 	namef   func() string
 	runf    func(ctx context.Context, errCh chan error, from chan dto.Data, args ...any)
 	stopf   func(errCh chan error, args ...any)
-	handlef handlef
+	handlef Handlef
 }
 
 func newProcess(name string, to chan dto.Data, args ...any) process {

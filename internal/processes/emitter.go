@@ -13,7 +13,7 @@ type emitter struct {
 	process
 }
 
-func NewWriter(to chan dto.Data) IProcess {
+func NewEriter(to chan dto.Data) IProcess {
 	emitter := emitter{process: newProcess("Emitter", to)}
 
 	emitter.process.runf = emitter.run
