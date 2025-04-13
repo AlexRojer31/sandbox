@@ -44,6 +44,7 @@ func Run(args []string) int {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
 		emitter.Stop(errors)
+		filter.Stop(errors)
 		reader.Stop(errors)
 
 		return exitcodes.Success

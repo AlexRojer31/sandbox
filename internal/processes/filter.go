@@ -25,7 +25,7 @@ func NewFilter(to chan dto.Data, filterf Filterf) IProcess {
 	return &filter
 }
 
-func (f *filter) handle(msg dto.Data) {
+func (f *filter) handle(msg dto.Data, errCh chan error) {
 	defer recovery.Recover()
 	if f.filterf(msg) {
 		f.process.to <- msg
