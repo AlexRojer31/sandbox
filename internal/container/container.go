@@ -1,6 +1,7 @@
 package container
 
 import (
+	"fmt"
 	"os"
 	"sync"
 
@@ -8,9 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const INITIAL_FAILED = "Container initial was failed: "
+
 type Container struct {
 	Env    *environment.Env
 	Logger *logrus.Logger
+
+	initialErrors []error
 }
 
 var (
@@ -23,16 +28,27 @@ func GetInstance(args ...any) *Container {
 		for _, a := range args {
 			switch v := a.(type) {
 			case []string:
-				container := Container{}
+				c := Container{
+					initialErrors: make([]error, 0),
+				}
 				env, err := environment.New(v)
 				if err != nil {
-					panic(err)
+					c.initialErrors = append(c.initialErrors, err)
 				}
-				container.Env = env
-				container.setLogger()
 
-				instance = &container
+				c.Env = env
+				c.setLogger()
+
+				if len(c.initialErrors) != 0 {
+					errorsStr := fmt.Sprint(c.initialErrors)
+
+					panic(INITIAL_FAILED + errorsStr)
+				}
+
+				instance = &c
 				return
+			default:
+				panic(INITIAL_FAILED)
 			}
 		}
 	})
