@@ -56,25 +56,25 @@ func GetInstance(args ...any) *Container {
 	return instance
 }
 
-func (app *Container) setLogger() {
-	app.Logger = logrus.New()
-	app.Logger.SetFormatter(
+func (c *Container) setLogger() {
+	c.Logger = logrus.New()
+	c.Logger.SetFormatter(
 		&logrus.TextFormatter{
 			TimestampFormat:        "2006-01-02 15:04:05",
 			FullTimestamp:          true,
 			PadLevelText:           true,
 			DisableLevelTruncation: true,
 		})
-	app.Logger.SetOutput(os.Stdout)
+	c.Logger.SetOutput(os.Stdout)
 
-	level, err := logrus.ParseLevel(app.Env.Config.LogLevel)
+	level, err := logrus.ParseLevel(c.Env.Config.LogLevel)
 	if err != nil {
 		level = logrus.ErrorLevel
 	}
 
-	if app.Env.Debug {
+	if c.Env.Debug {
 		level = logrus.DebugLevel
-		app.Logger.SetReportCaller(app.Env.Debug)
+		c.Logger.SetReportCaller(c.Env.Debug)
 	}
-	app.Logger.SetLevel(level)
+	c.Logger.SetLevel(level)
 }
