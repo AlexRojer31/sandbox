@@ -24,7 +24,7 @@ type reader struct {
 
 func newReader(name string, args ...any) *reader {
 	reader := reader{
-		commitCh: make(chan dto.Data, 1000),
+		commitCh: make(chan dto.Data, 10000),
 	}
 	reader.process = newProcess(name + "Reader")
 

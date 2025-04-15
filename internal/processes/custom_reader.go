@@ -28,6 +28,6 @@ func (r *customReader) fetchMsg() (dto.Data, error) {
 	}, nil
 }
 
-func (r *customReader) commitMsg(msg dto.Data, errCh chan dto.Data) {
+func (r *customReader) commitMsg(msg dto.Data, errCh chan<- dto.Data) {
 	r.logger.Info("Commiting")
 }
