@@ -29,18 +29,32 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	reader := processes.NewCustomReader()
-	filter := processes.NewFilter(func(msg dto.Data) bool {
-		if v, ok := msg.Value.(int); ok {
-			return v > 50
-		}
-		return false
-	})
-	sender := processes.NewSender("Super")
+	chain := NewChain(
+		"MyChain",
+		[]processes.IProcess{
+			processes.NewCustomReader(),
+			processes.NewFilter(func(msg dto.Data) bool {
+				if v, ok := msg.Value.(int); ok {
+					return v > 50
+				}
+				return false
+			}),
+			processes.NewSender("Super"),
+		},
+	)
+	chain.Run(ctx, errCh)
+	// reader := processes.NewCustomReader()
+	// filter := processes.NewFilter(func(msg dto.Data) bool {
+	// 	if v, ok := msg.Value.(int); ok {
+	// 		return v > 50
+	// 	}
+	// 	return false
+	// })
+	// sender := processes.NewSender("Super")
 
-	reader2filter := reader.Run(ctx, errCh, nil)
-	filter2sender := filter.Run(ctx, errCh, reader2filter)
-	sender.Run(ctx, errCh, filter2sender)
+	// reader2filter := reader.Run(ctx, errCh, nil)
+	// filter2sender := filter.Run(ctx, errCh, reader2filter)
+	// sender.Run(ctx, errCh, filter2sender)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -48,9 +62,10 @@ func Run(args []string) int {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
 
-		sender.Stop(errCh)
-		filter.Stop(errCh)
-		reader.Stop(errCh)
+		chain.Stop(errCh)
+		// sender.Stop(errCh)
+		// filter.Stop(errCh)
+		// reader.Stop(errCh)
 
 		errorObserver.Stop()
 		return exitcodes.Success
@@ -58,4 +73,64 @@ func Run(args []string) int {
 	ctxCancel()
 
 	return exitcodes.Failure
+}
+
+type Chain struct {
+	name      string
+	handlers  []IHandler
+	processes []processes.IProcess
+}
+
+func NewChain(name string, processes []processes.IProcess) *Chain {
+	len := len(processes)
+	chain := Chain{
+		name:     name,
+		handlers: make([]IHandler, len),
+	}
+	chain.processes = append(chain.processes, processes...)
+
+	lastElem := len - 1
+	for i := 0; i < len; i++ {
+		elemNum := len - 1 - i
+		if elemNum == lastElem {
+			chain.handlers[elemNum] = NewHandler(processes[elemNum], nil)
+		} else if elemNum < lastElem {
+			chain.handlers[elemNum] = NewHandler(processes[elemNum], chain.handlers[elemNum+1])
+		}
+	}
+
+	return &chain
+}
+
+func (c *Chain) Run(ctx context.Context, errCh chan<- dto.Data) {
+	c.handlers[0].Next(ctx, errCh, nil)
+}
+
+func (c *Chain) Stop(errCh chan<- dto.Data) {
+	for _, p := range c.processes {
+		p.Stop(errCh)
+	}
+}
+
+type Handler struct {
+	process processes.IProcess
+	next    IHandler
+}
+
+func NewHandler(process processes.IProcess, next IHandler) IHandler {
+	return &Handler{
+		process: process,
+		next:    next,
+	}
+}
+
+type IHandler interface {
+	Next(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data)
+}
+
+func (h *Handler) Next(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
+	fromCh := h.process.Run(ctx, errCh, from)
+	if h.next != nil {
+		h.next.Next(ctx, errCh, fromCh)
+	}
 }
