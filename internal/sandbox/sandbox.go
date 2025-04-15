@@ -29,16 +29,14 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	reader2filter := make(chan dto.Data, 1000)
-	filter2sender := make(chan dto.Data, 1000)
-	reader := processes.NewCustomReader(reader2filter)
-	filter := processes.NewFilter(filter2sender, func(msg dto.Data) bool {
+	reader := processes.NewCustomReader()
+	filter := processes.NewFilter(func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
 	})
 	sender := processes.NewSender("My")
 
-	reader.Run(ctx, errCh, nil)
-	filter.Run(ctx, errCh, reader2filter)
+	reader2filter := reader.Run(ctx, errCh, nil)
+	filter2sender := filter.Run(ctx, errCh, reader2filter)
 	sender.Run(ctx, errCh, filter2sender)
 
 	interrupt := make(chan os.Signal, 1)

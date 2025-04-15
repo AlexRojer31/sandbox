@@ -13,7 +13,7 @@ type sender struct {
 
 func NewSender(name string) IProcess {
 	sender := sender{}
-	sender.process = newProcess(name+"Sender", nil, sender.handle)
+	sender.process = newProcess(name+"Sender", sender.handle)
 
 	return &sender
 }
