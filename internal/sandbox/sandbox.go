@@ -29,9 +29,6 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	// emitter := processes.NewEmitter()
-	// sender := processes.NewSender("Super")
-	// sender.Run(ctx, errCh, emitter.Run(ctx, errCh, nil))
 	reader := processes.NewCustomReader()
 	filter := processes.NewFilter(func(msg dto.Data) bool {
 		return dto.ParceData[int](msg) > 50
@@ -47,8 +44,6 @@ func Run(args []string) int {
 	if sig, ok := <-interrupt; ok {
 		sandbox.container.Logger.Info("Catch signal ", sig.String())
 		ctxCancel()
-		// emitter.Stop(errCh)
-		// sender.Stop(errCh)
 
 		sender.Stop(errCh)
 		filter.Stop(errCh)
