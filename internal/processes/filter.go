@@ -15,13 +15,13 @@ type filter struct {
 
 func NewFilter(filterf Filterf) IProcess {
 	filter := filter{}
-	filter.process = newProcess("Filter", filter.handle)
+	filter.process = newProcess("Filter", (Handlef)(filter.handle))
 
-	if filterf == nil {
-		filter.filterf = filter.filter
-	} else {
+	filter.filterf = filter.filter
+	if filterf != nil {
 		filter.filterf = filterf
 	}
+
 	return &filter
 }
 

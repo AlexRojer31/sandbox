@@ -28,32 +28,26 @@ func newReader(name string, args ...any) *reader {
 	}
 	reader.process = newProcess(name + "Reader")
 
+	reader.runf = reader.run
+	reader.fetchf = reader.fetch
+	reader.fetchMsgf = func() (dto.Data, error) {
+		defer recovery.Recover()
+		time.Sleep(time.Second)
+		return dto.Data{
+			Value: 51,
+		}, nil
+	}
+	reader.commitf = reader.commit
+	reader.commitMsgf = func(msg dto.Data, errCh chan<- dto.Data) {}
+
 	for _, obj := range args {
 		switch v := obj.(type) {
-		case func() (dto.Data, error):
+		case Fetchf:
 			reader.fetchMsgf = v
-		case func(msg dto.Data, errCh chan<- dto.Data):
+		case Commitf:
 			reader.commitMsgf = v
 		}
 	}
-
-	if reader.fetchMsgf == nil {
-		reader.fetchMsgf = func() (dto.Data, error) {
-			defer recovery.Recover()
-			time.Sleep(time.Second)
-			return dto.Data{
-				Value: 51,
-			}, nil
-		}
-	}
-
-	if reader.commitMsgf == nil {
-		reader.commitMsgf = func(msg dto.Data, errCh chan<- dto.Data) {}
-	}
-
-	reader.fetchf = reader.fetch
-	reader.commitf = reader.commit
-	reader.runf = reader.run
 	return &reader
 }
 

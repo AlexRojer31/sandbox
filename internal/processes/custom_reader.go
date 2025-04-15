@@ -14,7 +14,7 @@ type customReader struct {
 
 func NewCustomReader() IProcess {
 	custom := customReader{}
-	custom.reader = newReader("Custom", custom.fetchMsg, custom.commitMsg)
+	custom.reader = newReader("Custom", (Fetchf)(custom.fetchMsg), (Commitf)(custom.commitMsg))
 
 	return &custom
 }

@@ -46,22 +46,6 @@ func newProcess(name string, args ...any) *process {
 	process.status = make(chan int, 1)
 	process.logger = container.GetInstance().Logger
 
-	for _, obj := range args {
-		switch v := obj.(type) {
-		case func(msg dto.Data, errCh chan<- dto.Data):
-			process.handlef = v
-		}
-	}
-
-	if process.handlef == nil {
-		process.handlef = func(msg dto.Data, errCh chan<- dto.Data) {
-			defer recovery.Recover()
-			if process.to != nil {
-				process.to <- msg
-			}
-		}
-	}
-
 	process.runf = process.run
 	process.namef = func() string {
 		return process.name
@@ -75,6 +59,20 @@ func newProcess(name string, args ...any) *process {
 		}
 		process.logger.Warn(process.name, " stopped")
 	}
+	process.handlef = func(msg dto.Data, errCh chan<- dto.Data) {
+		defer recovery.Recover()
+		if process.to != nil {
+			process.to <- msg
+		}
+	}
+
+	for _, obj := range args {
+		switch v := obj.(type) {
+		case Handlef:
+			process.handlef = v
+		}
+	}
+
 	return &process
 }
 
