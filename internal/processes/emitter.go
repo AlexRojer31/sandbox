@@ -13,14 +13,14 @@ type emitter struct {
 	*process
 }
 
-func NewEriter(to chan dto.Data) IProcess {
-	emitter := emitter{process: newProcess("Emitter", to)}
+func NewEmitter() IProcess {
+	emitter := emitter{process: newProcess("Emitter")}
 
 	emitter.runf = emitter.run
 	return &emitter
 }
 
-func (e *emitter) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
+func (e *emitter) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
 	defer recovery.Recover()
 	e.status <- 1
 	e.logger.Info(e.name, " started.")

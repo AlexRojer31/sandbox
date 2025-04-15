@@ -9,7 +9,7 @@ import (
 )
 
 type customReader struct {
-	reader
+	*reader
 }
 
 func NewCustomReader(to chan dto.Data, args ...any) IProcess {

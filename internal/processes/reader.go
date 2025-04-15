@@ -8,9 +8,9 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
-type Readerf func(ctx context.Context, errCh chan dto.Data, args ...any)
+type Readerf func(ctx context.Context, errCh chan<- dto.Data)
 type Fetchf func() (dto.Data, error)
-type Commitf func(msg dto.Data, errCh chan dto.Data)
+type Commitf func(msg dto.Data, errCh chan<- dto.Data)
 
 type reader struct {
 	*process
@@ -22,17 +22,17 @@ type reader struct {
 	commitMsgf Commitf
 }
 
-func newReader(name string, to chan dto.Data, args ...any) reader {
+func newReader(name string, args ...any) *reader {
 	reader := reader{
 		commitCh: make(chan dto.Data, 1000),
 	}
-	reader.process = newProcess(name+"Reader", to)
+	reader.process = newProcess(name + "Reader")
 
 	for _, obj := range args {
 		switch v := obj.(type) {
 		case func() (dto.Data, error):
 			reader.fetchMsgf = v
-		case func(msg dto.Data, errCh chan dto.Data):
+		case func(msg dto.Data, errCh chan<- dto.Data):
 			reader.commitMsgf = v
 		}
 	}
@@ -48,21 +48,21 @@ func newReader(name string, to chan dto.Data, args ...any) reader {
 	}
 
 	if reader.commitMsgf == nil {
-		reader.commitMsgf = func(msg dto.Data, errCh chan dto.Data) {}
+		reader.commitMsgf = func(msg dto.Data, errCh chan<- dto.Data) {}
 	}
 
 	reader.fetchf = reader.fetch
 	reader.commitf = reader.commit
 	reader.runf = reader.run
-	return reader
+	return &reader
 }
 
-func (r *reader) run(ctx context.Context, errCh chan dto.Data, from chan dto.Data, args ...any) {
-	go r.fetchf(ctx, errCh, args...)
-	go r.commitf(ctx, errCh, args...)
+func (r *reader) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
+	go r.fetchf(ctx, errCh)
+	go r.commitf(ctx, errCh)
 }
 
-func (r *reader) fetch(ctx context.Context, errCh chan dto.Data, args ...any) {
+func (r *reader) fetch(ctx context.Context, errCh chan<- dto.Data) {
 	defer recovery.Recover()
 	r.status <- 1
 	r.logger.Info(r.name, " fetch started.")
@@ -86,7 +86,7 @@ func (r *reader) fetch(ctx context.Context, errCh chan dto.Data, args ...any) {
 	}
 }
 
-func (r *reader) commit(ctx context.Context, errCh chan dto.Data, args ...any) {
+func (r *reader) commit(ctx context.Context, errCh chan<- dto.Data) {
 	defer recovery.Recover()
 	r.logger.Info(r.name, " commit started.")
 	for {
