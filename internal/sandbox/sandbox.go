@@ -43,18 +43,6 @@ func Run(args []string) int {
 		},
 	)
 	chain.Run(ctx, errCh)
-	// reader := processes.NewCustomReader()
-	// filter := processes.NewFilter(func(msg dto.Data) bool {
-	// 	if v, ok := msg.Value.(int); ok {
-	// 		return v > 50
-	// 	}
-	// 	return false
-	// })
-	// sender := processes.NewSender("Super")
-
-	// reader2filter := reader.Run(ctx, errCh, nil)
-	// filter2sender := filter.Run(ctx, errCh, reader2filter)
-	// sender.Run(ctx, errCh, filter2sender)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -63,9 +51,6 @@ func Run(args []string) int {
 		ctxCancel()
 
 		chain.Stop(errCh)
-		// sender.Stop(errCh)
-		// filter.Stop(errCh)
-		// reader.Stop(errCh)
 
 		errorObserver.Stop()
 		return exitcodes.Success
