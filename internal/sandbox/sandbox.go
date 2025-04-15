@@ -31,7 +31,10 @@ func Run(args []string) int {
 
 	reader := processes.NewCustomReader()
 	filter := processes.NewFilter(func(msg dto.Data) bool {
-		return dto.ParceData[int](msg) > 50
+		if v, ok := msg.Value.(int); ok {
+			return v > 50
+		}
+		return false
 	})
 	sender := processes.NewSender("Super")
 

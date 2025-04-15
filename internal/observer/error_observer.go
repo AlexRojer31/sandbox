@@ -18,5 +18,5 @@ func NewErrorObserver() IObserve {
 
 func (o *errorObserver) handle(msg dto.Data) {
 	recovery.Recover()
-	o.logger.Error(dto.ParceData[error](msg))
+	o.logger.Error(msg.Value)
 }

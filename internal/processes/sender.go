@@ -20,5 +20,5 @@ func NewSender(name string) IProcess {
 
 func (s *sender) handle(msg dto.Data, errCh chan<- dto.Data) {
 	defer recovery.Recover()
-	fmt.Println("Send to another service: ", dto.ParceData[int](msg))
+	fmt.Println("Send to another service: ", msg.Value)
 }
