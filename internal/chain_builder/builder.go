@@ -9,9 +9,7 @@ type IBuilder interface {
 	Build(chain.ChainConfig) chain.IChain
 }
 
-type Builder struct {
-	name string
-}
+type Builder struct{}
 
 func (b *Builder) Build(conf chain.ChainConfig) chain.IChain {
 	return chain.NewChain(conf.Name, b.makeProcesses(conf.Name, conf.Processes))
@@ -24,7 +22,7 @@ func (b *Builder) makeProcesses(name string, names []string) []processes.IProces
 		case "emitter":
 			proc = append(proc, processes.NewEmitter())
 		case "sender":
-			proc = append(proc, processes.NewSender(b.name))
+			proc = append(proc, processes.NewSender(name))
 		}
 	}
 
