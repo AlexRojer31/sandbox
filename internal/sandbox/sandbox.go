@@ -7,10 +7,9 @@ import (
 	"syscall"
 
 	"github.com/AlexRojer31/sandbox/internal/chain"
+	"github.com/AlexRojer31/sandbox/internal/chain_builder"
 	"github.com/AlexRojer31/sandbox/internal/container"
-	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/observer"
-	"github.com/AlexRojer31/sandbox/internal/processes"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/golangci/golangci-lint/pkg/exitcodes"
 )
@@ -30,19 +29,26 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	chain := chain.NewChain(
-		"MyChain",
-		[]processes.IProcess{
-			processes.NewCustomReader(),
-			processes.NewFilter(func(msg dto.Data) bool {
-				if v, ok := msg.Value.(int); ok {
-					return v > 50
-				}
-				return false
-			}),
-			processes.NewSender("Super"),
-		},
-	)
+	// chain := chain.NewChain(
+	// 	"MyChain",
+	// 	[]processes.IProcess{
+	// 		processes.NewCustomReader(),
+	// 		processes.NewFilter(func(msg dto.Data) bool {
+	// 			if v, ok := msg.Value.(int); ok {
+	// 				return v > 50
+	// 			}
+	// 			return false
+	// 		}),
+	// 		processes.NewSender("Super"),
+	// 	},
+	// )
+	// chain.Run(ctx, errCh)
+
+	builder := chain_builder.Builder{}
+	chain := builder.Build(chain.ChainConfig{
+		Name:      "MyTestChain",
+		Processes: []string{"emitter", "sender"},
+	})
 	chain.Run(ctx, errCh)
 
 	interrupt := make(chan os.Signal, 1)

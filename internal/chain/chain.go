@@ -7,6 +7,11 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/processes"
 )
 
+type ChainConfig struct {
+	Name      string
+	Processes []string
+}
+
 type IChain interface {
 	Run(ctx context.Context, errCh chan<- dto.Data)
 	Stop(errCh chan<- dto.Data)
