@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/AlexRojer31/sandbox/internal/chain"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/observer"
@@ -29,7 +30,7 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	chain := NewChain(
+	chain := chain.NewChain(
 		"MyChain",
 		[]processes.IProcess{
 			processes.NewCustomReader(),
@@ -58,69 +59,4 @@ func Run(args []string) int {
 	ctxCancel()
 
 	return exitcodes.Failure
-}
-
-type IChain interface {
-	Run(ctx context.Context, errCh chan<- dto.Data)
-	Stop(errCh chan<- dto.Data)
-}
-
-type Chain struct {
-	name      string
-	handlers  []IHandler
-	processes []processes.IProcess
-}
-
-func NewChain(name string, processes []processes.IProcess) IChain {
-	len := len(processes)
-	chain := Chain{
-		name:     name,
-		handlers: make([]IHandler, len),
-	}
-	chain.processes = append(chain.processes, processes...)
-
-	lastElem := len - 1
-	for i := 0; i < len; i++ {
-		elemNum := len - 1 - i
-		if elemNum == lastElem {
-			chain.handlers[elemNum] = NewHandler(processes[elemNum], nil)
-		} else if elemNum < lastElem {
-			chain.handlers[elemNum] = NewHandler(processes[elemNum], chain.handlers[elemNum+1])
-		}
-	}
-
-	return &chain
-}
-
-func (c *Chain) Run(ctx context.Context, errCh chan<- dto.Data) {
-	c.handlers[0].Next(ctx, errCh, nil)
-}
-
-func (c *Chain) Stop(errCh chan<- dto.Data) {
-	for _, p := range c.processes {
-		p.Stop(errCh)
-	}
-}
-
-type Handler struct {
-	process processes.IProcess
-	next    IHandler
-}
-
-func NewHandler(process processes.IProcess, next IHandler) IHandler {
-	return &Handler{
-		process: process,
-		next:    next,
-	}
-}
-
-type IHandler interface {
-	Next(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data)
-}
-
-func (h *Handler) Next(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
-	fromCh := h.process.Run(ctx, errCh, from)
-	if h.next != nil {
-		h.next.Next(ctx, errCh, fromCh)
-	}
 }
