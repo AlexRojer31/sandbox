@@ -3,12 +3,15 @@ package processes
 import (
 	"context"
 
-	"github.com/AlexRojer31/sandbox/internal/common"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/sirupsen/logrus"
 )
+
+type INamed interface {
+	GetName() string
+}
 
 type IRun interface {
 	Run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) <-chan dto.Data
@@ -16,7 +19,7 @@ type IRun interface {
 }
 
 type IProcess interface {
-	common.INamed
+	INamed
 	IRun
 }
 

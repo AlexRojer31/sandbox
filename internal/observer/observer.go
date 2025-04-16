@@ -3,15 +3,18 @@ package observer
 import (
 	"context"
 
-	"github.com/AlexRojer31/sandbox/internal/common"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/sirupsen/logrus"
 )
 
+type INamed interface {
+	GetName() string
+}
+
 type IObserve interface {
-	common.INamed
+	INamed
 	GetChannel() chan dto.Data
 	Observe(ctx context.Context)
 	Stop()
