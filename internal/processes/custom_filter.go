@@ -13,7 +13,7 @@ type customFilter struct {
 func newCustomFilter(name string) IProcess {
 	filter := customFilter{}
 	filter.abstractFilter = newAbstractFilter(name+"Custom", (Filterf)(filter.filter))
-	filter.to = make(chan dto.Data, filter.settings.CustomFilterSetting.Size)
+	filter.to = make(chan dto.Data, filter.settings.CustomFilterSetting.Common.Size)
 	filter.filterValue = filter.settings.CustomFilterSetting.MinValue
 
 	return &filter

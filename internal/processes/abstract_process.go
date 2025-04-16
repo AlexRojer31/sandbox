@@ -48,7 +48,7 @@ func newAbstractProcess(name string, args ...any) *abstractProcess {
 	process := abstractProcess{
 		name:     name,
 		settings: settings,
-		to:       make(chan dto.Data, settings.Size),
+		to:       make(chan dto.Data, settings.Common.Size),
 	}
 	process.status = make(chan int, 1)
 	process.logger = container.GetInstance().Logger

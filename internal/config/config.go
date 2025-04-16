@@ -18,20 +18,6 @@ type ChainConfig struct {
 	Processes []string `yaml:"processes" json:"processes"`
 }
 
-type ProcessesSettings struct {
-	Size                int                 `yaml:"size" json:"size"`
-	CustomFilterSetting CustomFilterSetting `yaml:"customFilterSetting" json:"customFilterSetting"`
-}
-
-type ProcessSetting struct {
-	Size int `yaml:"size" json:"size"`
-}
-
-type CustomFilterSetting struct {
-	ProcessSetting
-	MinValue int `yaml:"minValue" json:"minValue"`
-}
-
 func New(configFile string) (*Config, error) {
 	config := Config{}
 
