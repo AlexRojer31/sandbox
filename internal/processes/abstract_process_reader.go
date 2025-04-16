@@ -12,7 +12,7 @@ type Readerf func(ctx context.Context, errCh chan<- dto.Data)
 type Fetchf func() (dto.Data, error)
 type Commitf func(msg dto.Data, errCh chan<- dto.Data)
 
-type reader struct {
+type abstractReader struct {
 	*abstractProcess
 
 	commitCh   chan dto.Data
@@ -22,8 +22,8 @@ type reader struct {
 	commitMsgf Commitf
 }
 
-func newReader(name string, args ...any) *reader {
-	reader := reader{
+func newAbstractReader(name string, args ...any) *abstractReader {
+	reader := abstractReader{
 		commitCh: make(chan dto.Data, 10000),
 	}
 	reader.abstractProcess = newAbstractProcess(name + "Reader")
@@ -51,12 +51,12 @@ func newReader(name string, args ...any) *reader {
 	return &reader
 }
 
-func (r *reader) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
+func (r *abstractReader) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
 	go r.fetchf(ctx, errCh)
 	go r.commitf(ctx, errCh)
 }
 
-func (r *reader) fetch(ctx context.Context, errCh chan<- dto.Data) {
+func (r *abstractReader) fetch(ctx context.Context, errCh chan<- dto.Data) {
 	defer recovery.Recover()
 	r.status <- 1
 	r.logger.Info(r.name, " fetch started.")
@@ -80,7 +80,7 @@ func (r *reader) fetch(ctx context.Context, errCh chan<- dto.Data) {
 	}
 }
 
-func (r *reader) commit(ctx context.Context, errCh chan<- dto.Data) {
+func (r *abstractReader) commit(ctx context.Context, errCh chan<- dto.Data) {
 	defer recovery.Recover()
 	r.logger.Info(r.name, " commit started.")
 	for {

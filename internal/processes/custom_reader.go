@@ -9,12 +9,12 @@ import (
 )
 
 type customReader struct {
-	*reader
+	*abstractReader
 }
 
 func newCustomReader(name string) IProcess {
 	custom := customReader{}
-	custom.reader = newReader(name+"Custom", (Fetchf)(custom.fetchMsg), (Commitf)(custom.commitMsg))
+	custom.abstractReader = newAbstractReader(name+"Custom", (Fetchf)(custom.fetchMsg), (Commitf)(custom.commitMsg))
 
 	return &custom
 }
