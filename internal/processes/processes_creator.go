@@ -8,10 +8,14 @@ func (pc *processesCreator) getCustomEmitter() IProcess {
 	return newCustomEmitter(pc.prefix)
 }
 
-func (pc *processesCreator) getAbstractSender() IProcess {
-	return newSender(pc.prefix)
+func (pc *processesCreator) getCustomSender() IProcess {
+	return newCustomSender(pc.prefix)
 }
 
 func (pc *processesCreator) getCustomFilter() IProcess {
 	return newCustomFilter(pc.prefix)
+}
+
+func (pc *processesCreator) getCustomReader() IProcess {
+	return newCustomReader(pc.prefix)
 }

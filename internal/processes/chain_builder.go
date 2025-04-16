@@ -20,7 +20,9 @@ func (b *Builder) makeProcesses(name string, names []string) []IProcess {
 		case "filter":
 			proc = append(proc, pc.getCustomFilter())
 		case "sender":
-			proc = append(proc, pc.getAbstractSender())
+			proc = append(proc, pc.getCustomSender())
+		case "reader":
+			proc = append(proc, pc.getCustomReader())
 		}
 	}
 

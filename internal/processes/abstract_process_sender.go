@@ -11,7 +11,7 @@ type abstractSender struct {
 	*abstractProcess
 }
 
-func newSender(name string, args ...any) *abstractSender {
+func newAbstractSender(name string, args ...any) *abstractSender {
 	sender := abstractSender{}
 	sender.abstractProcess = newAbstractProcess(name+"Sender", (Handlef)(sender.handle))
 
