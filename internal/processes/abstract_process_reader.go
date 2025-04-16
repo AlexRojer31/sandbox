@@ -26,7 +26,7 @@ func newReader(name string, args ...any) *reader {
 	reader := reader{
 		commitCh: make(chan dto.Data, 10000),
 	}
-	reader.abstractProcess = newProcess(name + "Reader")
+	reader.abstractProcess = newAbstractProcess(name + "Reader")
 
 	reader.runf = reader.run
 	reader.fetchf = reader.fetch

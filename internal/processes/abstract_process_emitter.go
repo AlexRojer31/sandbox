@@ -9,18 +9,25 @@ import (
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 )
 
-type emitter struct {
+type abstractEmitter struct {
 	*abstractProcess
 }
 
-func NewEmitter() IProcess {
-	emitter := emitter{abstractProcess: newProcess("Emitter")}
+func newEmitter(name string, args ...any) *abstractEmitter {
+	emitter := abstractEmitter{abstractProcess: newAbstractProcess("Emitter")}
 
 	emitter.runf = emitter.run
+
+	for _, obj := range args {
+		switch v := obj.(type) {
+		case Runf:
+			emitter.runf = v
+		}
+	}
 	return &emitter
 }
 
-func (e *emitter) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
+func (e *abstractEmitter) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
 	defer recovery.Recover()
 	e.status <- 1
 	e.logger.Info(e.name, " started.")

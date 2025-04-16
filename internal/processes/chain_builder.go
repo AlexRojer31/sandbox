@@ -12,12 +12,15 @@ func (b *Builder) Build(conf ChainConfig) IChain {
 
 func (b *Builder) makeProcesses(name string, names []string) []IProcess {
 	var proc []IProcess
+	pc := processesCreator{prefix: name}
 	for _, n := range names {
 		switch n {
 		case "emitter":
-			proc = append(proc, NewEmitter())
+			proc = append(proc, pc.getAbstractEmitter())
+		case "filter":
+			proc = append(proc, pc.getCustomFilter())
 		case "sender":
-			proc = append(proc, NewSender(name))
+			proc = append(proc, pc.getAbstractSender())
 		}
 	}
 

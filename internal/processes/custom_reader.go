@@ -12,9 +12,9 @@ type customReader struct {
 	*reader
 }
 
-func NewCustomReader() IProcess {
+func newCustomReader(name string) IProcess {
 	custom := customReader{}
-	custom.reader = newReader("Custom", (Fetchf)(custom.fetchMsg), (Commitf)(custom.commitMsg))
+	custom.reader = newReader(name+"Custom", (Fetchf)(custom.fetchMsg), (Commitf)(custom.commitMsg))
 
 	return &custom
 }

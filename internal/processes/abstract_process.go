@@ -38,7 +38,7 @@ type abstractProcess struct {
 	handlef Handlef
 }
 
-func newProcess(name string, args ...any) *abstractProcess {
+func newAbstractProcess(name string, args ...any) *abstractProcess {
 	process := abstractProcess{
 		name: name,
 		to:   make(chan dto.Data, 10000),

@@ -28,25 +28,10 @@ func Run(args []string) int {
 	errCh := errorObserver.GetChannel()
 	errorObserver.Observe(ctx)
 
-	// chain := chain.NewChain(
-	// 	"MyChain",
-	// 	[]processes.IProcess{
-	// 		processes.NewCustomReader(),
-	// 		processes.NewFilter(func(msg dto.Data) bool {
-	// 			if v, ok := msg.Value.(int); ok {
-	// 				return v > 50
-	// 			}
-	// 			return false
-	// 		}),
-	// 		processes.NewSender("Super"),
-	// 	},
-	// )
-	// chain.Run(ctx, errCh)
-
 	builder := processes.Builder{}
 	chain := builder.Build(processes.ChainConfig{
 		Name:      "MyTestChain",
-		Processes: []string{"emitter", "sender"},
+		Processes: []string{"emitter", "filter", "sender"},
 	})
 	chain.Run(ctx, errCh)
 
