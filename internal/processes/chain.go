@@ -1,10 +1,9 @@
-package chain
+package processes
 
 import (
 	"context"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
-	"github.com/AlexRojer31/sandbox/internal/processes"
 )
 
 type ChainConfig struct {
@@ -20,10 +19,10 @@ type IChain interface {
 type Chain struct {
 	name      string
 	handlers  []IHandler
-	processes []processes.IProcess
+	processes []IProcess
 }
 
-func NewChain(name string, processes []processes.IProcess) IChain {
+func NewChain(name string, processes []IProcess) IChain {
 	len := len(processes)
 	chain := Chain{
 		name:     name,

@@ -8,12 +8,12 @@ import (
 )
 
 type sender struct {
-	*process
+	*abstractProcess
 }
 
 func NewSender(name string) IProcess {
 	sender := sender{}
-	sender.process = newProcess(name+"Sender", (Handlef)(sender.handle))
+	sender.abstractProcess = newProcess(name+"Sender", (Handlef)(sender.handle))
 
 	return &sender
 }

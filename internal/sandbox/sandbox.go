@@ -6,10 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/AlexRojer31/sandbox/internal/chain"
-	"github.com/AlexRojer31/sandbox/internal/chain_builder"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/observer"
+	"github.com/AlexRojer31/sandbox/internal/processes"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
 	"github.com/golangci/golangci-lint/pkg/exitcodes"
 )
@@ -44,8 +43,8 @@ func Run(args []string) int {
 	// )
 	// chain.Run(ctx, errCh)
 
-	builder := chain_builder.Builder{}
-	chain := builder.Build(chain.ChainConfig{
+	builder := processes.Builder{}
+	chain := builder.Build(processes.ChainConfig{
 		Name:      "MyTestChain",
 		Processes: []string{"emitter", "sender"},
 	})

@@ -25,7 +25,7 @@ type Runf func(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data)
 type Stopf func(errCh chan<- dto.Data)
 type Handlef func(msg dto.Data, errCh chan<- dto.Data)
 
-type process struct {
+type abstractProcess struct {
 	name string
 	to   chan dto.Data
 
@@ -38,8 +38,8 @@ type process struct {
 	handlef Handlef
 }
 
-func newProcess(name string, args ...any) *process {
-	process := process{
+func newProcess(name string, args ...any) *abstractProcess {
+	process := abstractProcess{
 		name: name,
 		to:   make(chan dto.Data, 10000),
 	}
@@ -76,20 +76,20 @@ func newProcess(name string, args ...any) *process {
 	return &process
 }
 
-func (p *process) GetName() string {
+func (p *abstractProcess) GetName() string {
 	return p.namef()
 }
 
-func (p *process) Run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) <-chan dto.Data {
+func (p *abstractProcess) Run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) <-chan dto.Data {
 	go p.runf(ctx, errCh, from)
 	return p.to
 }
 
-func (p *process) Stop(errCh chan<- dto.Data) {
+func (p *abstractProcess) Stop(errCh chan<- dto.Data) {
 	p.stopf(errCh)
 }
 
-func (p *process) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
+func (p *abstractProcess) run(ctx context.Context, errCh chan<- dto.Data, from <-chan dto.Data) {
 	defer recovery.Recover()
 	p.status <- 1
 	p.logger.Info(p.name, " started.")

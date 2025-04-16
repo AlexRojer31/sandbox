@@ -1,10 +1,9 @@
-package chain
+package processes
 
 import (
 	"context"
 
 	"github.com/AlexRojer31/sandbox/internal/dto"
-	"github.com/AlexRojer31/sandbox/internal/processes"
 )
 
 type IHandler interface {
@@ -12,11 +11,11 @@ type IHandler interface {
 }
 
 type Handler struct {
-	process processes.IProcess
+	process IProcess
 	next    IHandler
 }
 
-func NewHandler(process processes.IProcess, next IHandler) IHandler {
+func NewHandler(process IProcess, next IHandler) IHandler {
 	return &Handler{
 		process: process,
 		next:    next,

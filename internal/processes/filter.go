@@ -8,14 +8,14 @@ import (
 type Filterf func(msg dto.Data) bool
 
 type filter struct {
-	*process
+	*abstractProcess
 
 	filterf Filterf
 }
 
 func NewFilter(filterf Filterf) IProcess {
 	filter := filter{}
-	filter.process = newProcess("Filter", (Handlef)(filter.handle))
+	filter.abstractProcess = newProcess("Filter", (Handlef)(filter.handle))
 
 	filter.filterf = filter.filter
 	if filterf != nil {

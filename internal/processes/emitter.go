@@ -10,11 +10,11 @@ import (
 )
 
 type emitter struct {
-	*process
+	*abstractProcess
 }
 
 func NewEmitter() IProcess {
-	emitter := emitter{process: newProcess("Emitter")}
+	emitter := emitter{abstractProcess: newProcess("Emitter")}
 
 	emitter.runf = emitter.run
 	return &emitter

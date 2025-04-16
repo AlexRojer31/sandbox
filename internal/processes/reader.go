@@ -13,7 +13,7 @@ type Fetchf func() (dto.Data, error)
 type Commitf func(msg dto.Data, errCh chan<- dto.Data)
 
 type reader struct {
-	*process
+	*abstractProcess
 
 	commitCh   chan dto.Data
 	fetchf     Readerf
@@ -26,7 +26,7 @@ func newReader(name string, args ...any) *reader {
 	reader := reader{
 		commitCh: make(chan dto.Data, 10000),
 	}
-	reader.process = newProcess(name + "Reader")
+	reader.abstractProcess = newProcess(name + "Reader")
 
 	reader.runf = reader.run
 	reader.fetchf = reader.fetch
