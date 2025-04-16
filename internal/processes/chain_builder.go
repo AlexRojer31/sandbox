@@ -16,7 +16,7 @@ func (b *Builder) makeProcesses(name string, names []string) []IProcess {
 	for _, n := range names {
 		switch n {
 		case "emitter":
-			proc = append(proc, pc.getAbstractEmitter())
+			proc = append(proc, pc.getCustomEmitter())
 		case "filter":
 			proc = append(proc, pc.getCustomFilter())
 		case "sender":

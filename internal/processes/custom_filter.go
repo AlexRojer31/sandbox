@@ -18,7 +18,7 @@ func newCustomFilter(name string) IProcess {
 func (f *customFilter) filter(msg dto.Data) bool {
 	v, ok := msg.Value.(int)
 	if ok {
-		return v > 50
+		return v > 10
 	}
 	return false
 }

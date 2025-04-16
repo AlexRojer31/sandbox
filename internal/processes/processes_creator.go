@@ -4,8 +4,8 @@ type processesCreator struct {
 	prefix string
 }
 
-func (pc *processesCreator) getAbstractEmitter() IProcess {
-	return newEmitter(pc.prefix)
+func (pc *processesCreator) getCustomEmitter() IProcess {
+	return newCustomEmitter(pc.prefix)
 }
 
 func (pc *processesCreator) getAbstractSender() IProcess {
