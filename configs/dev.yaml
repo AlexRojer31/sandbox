@@ -1,1 +1,7 @@
 logLevel: 'info'
+
+processesSettings: 
+  size: 10000
+  customFilterSetting:
+    size: 1
+    minValue: 10

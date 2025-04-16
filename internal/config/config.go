@@ -8,7 +8,22 @@ import (
 )
 
 type Config struct {
-	LogLevel string `yaml:"logLevel" json:"logLevel"`
+	LogLevel          string            `yaml:"logLevel" json:"logLevel"`
+	ProcessesSettings ProcessesSettings `yaml:"processesSettings" json:"processesSettings"`
+}
+
+type ProcessesSettings struct {
+	Size                int                 `yaml:"size" json:"size"`
+	CustomFilterSetting CustomFilterSetting `yaml:"customFilterSetting" json:"customFilterSetting"`
+}
+
+type ProcessSetting struct {
+	Size int `yaml:"size" json:"size"`
+}
+
+type CustomFilterSetting struct {
+	ProcessSetting
+	MinValue int `yaml:"minValue" json:"minValue"`
 }
 
 func New(configFile string) (*Config, error) {

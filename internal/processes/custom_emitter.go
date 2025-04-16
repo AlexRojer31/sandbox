@@ -33,7 +33,7 @@ func (e *customEmitter) run(ctx context.Context, errCh chan<- dto.Data, from <-c
 		default:
 			time.Sleep(time.Second)
 			e.to <- dto.Data{
-				Value: rand.Intn(20),
+				Value: rand.Intn(100),
 			}
 		}
 	}

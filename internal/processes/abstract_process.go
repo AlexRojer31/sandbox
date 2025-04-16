@@ -3,6 +3,7 @@ package processes
 import (
 	"context"
 
+	"github.com/AlexRojer31/sandbox/internal/config"
 	"github.com/AlexRojer31/sandbox/internal/container"
 	"github.com/AlexRojer31/sandbox/internal/dto"
 	"github.com/AlexRojer31/sandbox/internal/recovery"
@@ -32,8 +33,9 @@ type abstractProcess struct {
 	name string
 	to   chan dto.Data
 
-	status chan int
-	logger *logrus.Logger
+	settings config.ProcessesSettings
+	status   chan int
+	logger   *logrus.Logger
 
 	namef   Namef
 	runf    Runf
@@ -42,9 +44,11 @@ type abstractProcess struct {
 }
 
 func newAbstractProcess(name string, args ...any) *abstractProcess {
+	settings := container.GetInstance().Env.Config.ProcessesSettings
 	process := abstractProcess{
-		name: name,
-		to:   make(chan dto.Data, 10000),
+		name:     name,
+		settings: settings,
+		to:       make(chan dto.Data, settings.Size),
 	}
 	process.status = make(chan int, 1)
 	process.logger = container.GetInstance().Logger
