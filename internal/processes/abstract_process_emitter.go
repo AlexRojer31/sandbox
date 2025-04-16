@@ -14,7 +14,7 @@ type abstractEmitter struct {
 }
 
 func newAbstractEmitter(name string, args ...any) *abstractEmitter {
-	emitter := abstractEmitter{abstractProcess: newAbstractProcess("Emitter")}
+	emitter := abstractEmitter{abstractProcess: newAbstractProcess(name + "Emitter")}
 
 	emitter.runf = emitter.run
 

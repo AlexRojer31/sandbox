@@ -15,7 +15,7 @@ type abstractFilter struct {
 
 func newAbstractFilter(name string, args ...any) *abstractFilter {
 	filter := abstractFilter{}
-	filter.abstractProcess = newAbstractProcess("Filter", (Handlef)(filter.handle))
+	filter.abstractProcess = newAbstractProcess(name+"Filter", (Handlef)(filter.handle))
 
 	filter.filterf = filter.filter
 
