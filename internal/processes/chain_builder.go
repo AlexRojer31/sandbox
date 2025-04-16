@@ -1,6 +1,10 @@
 package processes
 
-import "github.com/AlexRojer31/sandbox/internal/config"
+import (
+	"reflect"
+
+	"github.com/AlexRojer31/sandbox/internal/config"
+)
 
 type IBuilder interface {
 	Build(conf config.ChainConfig) IChain
@@ -14,19 +18,37 @@ func (b *Builder) Build(conf config.ChainConfig) IChain {
 
 func (b *Builder) makeProcesses(name string, names []string) []IProcess {
 	var proc []IProcess
-	pc := processesCreator{prefix: name}
+	pc := NewProcessCreator(name)
 	for _, n := range names {
-		switch n {
-		case "emitter":
-			proc = append(proc, pc.getCustomEmitter())
-		case "filter":
-			proc = append(proc, pc.getCustomFilter())
-		case "sender":
-			proc = append(proc, pc.getCustomSender())
-		case "reader":
-			proc = append(proc, pc.getCustomReader())
+		process := b.call(pc, "Get"+n)
+		if process != nil {
+			switch v := process.(type) {
+			case IProcess:
+				proc = append(proc, v)
+			}
 		}
 	}
 
 	return proc
+}
+
+func (b *Builder) call(obj IProcessesCreator, methodName string, args ...any) any {
+	e := reflect.ValueOf(obj)
+	method := e.MethodByName(methodName)
+
+	if !method.IsValid() {
+		return nil
+	}
+
+	methodArgs := make([]reflect.Value, len(args))
+	for i, arg := range args {
+		methodArgs[i] = reflect.ValueOf(arg)
+	}
+
+	result := method.Call(methodArgs)
+	if len(result) > 0 {
+		return result[0].Interface()
+	}
+
+	return nil
 }

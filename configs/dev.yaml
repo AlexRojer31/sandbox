@@ -10,12 +10,12 @@ chains:
   -
     name: "MyTestChain"
     processes:
-      - "emitter"
-      - "filter"
-      - "sender"
+      - "CustomEmitter"
+      - "CustomFilter"
+      - "CustomSender"
   -
     name: "MyAnotherChain"
     processes:
-      - "reader"
-      - "filter"
-      - "sender"
+      - "CustomReader"
+      - "CustomFilter"
+      - "CustomSender"
