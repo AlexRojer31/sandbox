@@ -1,12 +1,14 @@
 package processes
 
+import "github.com/AlexRojer31/sandbox/internal/config"
+
 type IBuilder interface {
-	Build(ChainConfig) IChain
+	Build(conf config.ChainConfig) IChain
 }
 
 type Builder struct{}
 
-func (b *Builder) Build(conf ChainConfig) IChain {
+func (b *Builder) Build(conf config.ChainConfig) IChain {
 	return NewChain(conf.Name, b.makeProcesses(conf.Name, conf.Processes))
 }
 

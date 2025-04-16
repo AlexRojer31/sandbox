@@ -5,3 +5,17 @@ processesSettings:
   customFilterSetting:
     size: 1
     minValue: 10
+
+chains:
+  -
+    name: "MyTestChain"
+    processes:
+      - "emitter"
+      - "filter"
+      - "sender"
+  -
+    name: "MyAnotherChain"
+    processes:
+      - "reader"
+      - "filter"
+      - "sender"

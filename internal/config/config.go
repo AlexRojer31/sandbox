@@ -10,6 +10,12 @@ import (
 type Config struct {
 	LogLevel          string            `yaml:"logLevel" json:"logLevel"`
 	ProcessesSettings ProcessesSettings `yaml:"processesSettings" json:"processesSettings"`
+	Chains            []ChainConfig     `yaml:"chains" json:"chains"`
+}
+
+type ChainConfig struct {
+	Name      string   `yaml:"name" json:"name"`
+	Processes []string `yaml:"processes" json:"processes"`
 }
 
 type ProcessesSettings struct {
