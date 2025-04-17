@@ -89,7 +89,7 @@ func (r *abstractReader) commit(ctx context.Context, errCh chan<- dto.Data) {
 			for msg := range r.commitCh {
 				r.commitMsgf(msg, errCh)
 			}
-			close(r.status)
+			r.status <- -1
 			return
 		case msg, ok := <-r.commitCh:
 			if ok {

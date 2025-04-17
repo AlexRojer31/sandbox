@@ -50,7 +50,7 @@ func newAbstractProcess(name string, args ...any) *abstractProcess {
 		settings: settings,
 		to:       make(chan dto.Data, settings.Common.Size),
 	}
-	process.status = make(chan int, 1)
+	process.status = make(chan int, 1000)
 	process.logger = container.GetInstance().Logger
 
 	process.runf = process.run
@@ -59,8 +59,11 @@ func newAbstractProcess(name string, args ...any) *abstractProcess {
 	}
 	process.stopf = func(errCh chan<- dto.Data) {
 		process.logger.Warn(process.name, " stopping...")
+		wait := 0
 		for v := range process.status {
-			if v > 0 {
+			wait += v
+			if wait == 0 {
+				close(process.status)
 				continue
 			}
 		}
@@ -109,7 +112,7 @@ func (p *abstractProcess) run(ctx context.Context, errCh chan<- dto.Data, from <
 			if p.to != nil {
 				close(p.to)
 			}
-			close(p.status)
+			p.status <- -1
 			return
 		case msg, ok := <-from:
 			if ok {

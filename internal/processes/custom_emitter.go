@@ -28,7 +28,7 @@ func (e *customEmitter) run(ctx context.Context, errCh chan<- dto.Data, from <-c
 		select {
 		case <-ctx.Done():
 			close(e.to)
-			close(e.status)
+			e.status <- -1
 			return
 		default:
 			time.Sleep(time.Second)
