@@ -41,3 +41,15 @@ func TestFibRecursive(t *testing.T) {
 	assert.Equal(t, expected1, actual1)
 	assert.Equal(t, expected2, actual2)
 }
+
+func BenchmarkFibIterative(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		FibIterative(uint(10))
+	}
+}
+
+func BenchmarkFibRecursive(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		FibRecursive(uint(10))
+	}
+}
