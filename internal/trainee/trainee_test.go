@@ -43,12 +43,14 @@ func TestFibRecursive(t *testing.T) {
 }
 
 func BenchmarkFibIterative(b *testing.B) {
+	b.SetBytes(10)
 	for i := 0; i < b.N; i++ {
 		FibIterative(uint(10))
 	}
 }
 
 func BenchmarkFibRecursive(b *testing.B) {
+	b.SetBytes(10)
 	for i := 0; i < b.N; i++ {
 		FibRecursive(uint(10))
 	}
