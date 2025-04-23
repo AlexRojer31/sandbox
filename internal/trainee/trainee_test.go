@@ -30,3 +30,14 @@ func TestAnotherEnglish(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 }
+
+func TestFibRecursive(t *testing.T) {
+	expected1 := uint(55)
+	actual1 := FibRecursive(10)
+
+	expected2 := uint(55)
+	actual2 := FibIterative(10)
+
+	assert.Equal(t, expected1, actual1)
+	assert.Equal(t, expected2, actual2)
+}
